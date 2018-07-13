@@ -1,22 +1,32 @@
-module Spree
-  Order.class_eval do
-    scope :abandoned,
-      -> { limit_time = Time.current - SpreeAbandonedCarts::Config.abandoned_after_minutes.minutes
+Spree::Order.class_eval do
+  scope :abandoned, ->(time = Time.current - SolidusAbandonedCarts::Config
+    .abandoned_after_minutes.minutes) do
+    incomplete.
+    where('email IS NOT NULL').
+    where('item_count > 0').
+    where('updated_at < ?', time)
+  end
 
-           incomplete.
-           where("#{quoted_table_name}.item_total > 0").
-           where("#{quoted_table_name}.updated_at < ?", limit_time) }
+  scope :abandon_not_notified, -> do
+    abandoned.where(abandoned_cart_email_sent_at: nil)
+  end
 
-    scope :abandon_not_notified,
-      -> { abandoned.where(abandoned_cart_email_sent_at: nil) }
+  def abandoned_cart_actions
+    abandoned_cart_class.abandoned_cart_email(self).deliver_now
+    touch(:abandoned_cart_email_sent_at)
+  end
 
-    def abandoned_cart_actions
-      AbandonedCartMailer.abandoned_cart_email(self).deliver
-      touch(:abandoned_cart_email_sent_at)
-    end
+  def last_for_user?
+    Spree::Order.where(email: email).where('id > ?', id).none?
+  end
 
-    def last_for_user?
-      Order.where(email: email).where('id > ?', id).none?
+  protected
+
+  def abandoned_cart_class
+    if Spree.respond_to?(:solidus_version) && Spree.solidus_version > '2.4'
+      Spree::Config.abandoned_cart_mailer_class
+    else
+      Spree::AbandonedCartMailer
     end
   end
 end

@@ -1,8 +1,7 @@
-module SpreeAbandonedCarts
+module SolidusAbandonedCarts
   class Engine < Rails::Engine
-    require 'spree/core'
     isolate_namespace Spree
-    engine_name 'spree_abandoned_carts'
+    engine_name 'solidus_abandoned_carts'
 
     config.autoload_paths += %W(#{config.root}/lib)
 
@@ -11,8 +10,8 @@ module SpreeAbandonedCarts
       g.test_framework :rspec
     end
 
-    initializer 'spree_abandoned_carts.environment', before: :load_config_initializers do |app|
-      SpreeAbandonedCarts::Config = SpreeAbandonedCarts::Configuration.new
+    initializer 'solidus_abandoned_carts.environment', before: :load_config_initializers do |app|
+      SolidusAbandonedCarts::Config = SolidusAbandonedCarts::Configuration.new
     end
 
     def self.activate
