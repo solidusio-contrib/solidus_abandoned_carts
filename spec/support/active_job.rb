@@ -1,4 +1,6 @@
-RSpec.configure do |config|
+# frozen_string_literal: true
+
+RSpec.configure do
   include ActiveJob::TestHelper
 end
 

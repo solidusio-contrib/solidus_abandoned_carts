@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SolidusAbandonedCarts
   class Configuration < Spree::Preferences::Configuration
     preference :abandoned_states, :array, default: [:cart, :address, :delivery, :payment, :confirm]
