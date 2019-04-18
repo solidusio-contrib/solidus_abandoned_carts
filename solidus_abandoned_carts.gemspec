@@ -18,8 +18,8 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*", 'LICENSE', 'Rakefile', 'README.md']
   s.test_files = Dir['test/**/*']
 
-  s.add_dependency 'solidus', ['>= 1.0', '< 3']
-  s.add_dependency 'solidus_auth_devise', ['>= 1.0', '< 3']
+  s.add_dependency 'solidus', ['>= 2.0', '< 3']
+  s.add_dependency 'solidus_auth_devise', ['>= 2.0', '< 3']
   s.add_dependency 'solidus_support'
   s.add_dependency 'deface', '~> 1.0'
 
