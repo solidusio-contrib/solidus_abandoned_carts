@@ -2,7 +2,7 @@
 
 AllCops:
   Exclude:
-    - 'solidus_conekta_card.gemspec'
+    - 'solidus_abandoned_carts.gemspec'
     - 'spec/dummy/**/*'
     - 'vendor/bundle/**/*'
   TargetRubyVersion: 2.5

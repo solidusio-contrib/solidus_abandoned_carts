@@ -14,7 +14,7 @@ module Spree
       end
 
       if self.class.respond_to?(:perform_in)
-        self.class.new.perform_in(next_run.minutes) if next_run > 0
+        self.class.new.perform_in(next_run.minutes) if next_run.positive?
       end
 
       if self.class.respond_to?(:perform_later)
