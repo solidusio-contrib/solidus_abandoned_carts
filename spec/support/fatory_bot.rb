@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'ffaker'
 require 'factory_bot'
 

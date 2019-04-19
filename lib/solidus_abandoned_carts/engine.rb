@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SolidusAbandonedCarts
   class Engine < Rails::Engine
     isolate_namespace Spree
@@ -10,7 +12,7 @@ module SolidusAbandonedCarts
       g.test_framework :rspec
     end
 
-    initializer 'solidus_abandoned_carts.environment', before: :load_config_initializers do |app|
+    initializer 'solidus_abandoned_carts.environment', before: :load_config_initializers do
       SolidusAbandonedCarts::Config = SolidusAbandonedCarts::Configuration.new
     end
 
@@ -20,6 +22,6 @@ module SolidusAbandonedCarts
       end
     end
 
-    config.to_prepare &method(:activate).to_proc
+    config.to_prepare(&method(:activate).to_proc)
   end
 end

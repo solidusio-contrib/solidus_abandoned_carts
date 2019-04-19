@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Spree::Order do
   let(:abandoned_time) { Time.current - SolidusAbandonedCarts::Config.abandoned_after_minutes.minutes - 1.second }
   let!(:abandoned_order) { create(:order, updated_at: abandoned_time, item_count: 100) }
