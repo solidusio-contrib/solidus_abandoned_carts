@@ -1,7 +1,7 @@
 
 SolidusAbandonedCarts
 ===================
-[![Build Status](https://travis-ci.org/jtapia/solidus_abandoned_carts.svg?branch=master)](https://travis-ci.org/jtapia/solidus_abandoned_carts)
+[![Build Status](https://travis-ci.org/solidusio-contrib/solidus_abandoned_carts.svg?branch=master)](https://travis-ci.org/solidusio-contrib/solidus_abandoned_carts)
 
 Take some action for abandoned (incompleted) carts.
 
@@ -17,7 +17,7 @@ Installation
 Add this line to your solidus application's Gemfile:
 
 ```ruby
-gem 'solidus_abandoned_carts', github: 'jtapia/solidus_abandoned_carts'
+gem 'solidus_abandoned_carts', github: 'solidusio-contrib/solidus_abandoned_carts'
 ```
 
 And then execute:
