@@ -1,62 +1,86 @@
+# SolidusAbandonedCarts
 
-SolidusAbandonedCarts
-===================
 [![Build Status](https://travis-ci.org/solidusio-contrib/solidus_abandoned_carts.svg?branch=master)](https://travis-ci.org/solidusio-contrib/solidus_abandoned_carts)
 
-Take some action for abandoned (incompleted) carts.
+Take action on your abandoned carts!
 
-Override `Spree::Order#abandoned_cart_actions` with your logic.
-By default an email is sent, see `AbandonedCartMailer`.
+## Installation
 
-You have to trigger the method in some way, an example recurring ActiveJob worker
-is included.
-
-Installation
-------------
-
-Add this line to your solidus application's Gemfile:
+Add this line to your application's Gemfile:
 
 ```ruby
 gem 'solidus_abandoned_carts', github: 'solidusio-contrib/solidus_abandoned_carts'
 ```
 
-And then execute:
+Then run the following:
 
-```shell
-$ bundle
+```console
+$ bundle install
 $ bundle exec rails g solidus_abandoned_carts:install
 ```
 
-Usage
------
-
-There are some preferences you can change (defaults are shown here):
+If you want to change the configuration, you can add the following to an initializer:
 
 ```ruby
 SolidusAbandonedCarts::Config.tap do |config|
-  # when an order can be marked as abandoned
-  config.abandoned_after_minutes = 1440 # 24 hours
-  # how often the sidekiq worker should run
-  config.worker_frequency_minutes = 30
+  # Amount of time after which a cart is considered abandoned.
+  config.abandoned_after = 24.hours
+
+  # The states in which a cart is considered to be abandoned.
+  config.abandoned_states = [:cart, :address, :delivery, :payment, :confirm]
+
+  # Service object that will be called for abandoned carts.
+  config.notifier_class = 'Spree::AbandonedCartNotifier' 
 end
 ```
 
-You can perform the processing of the abandoned carts at any time:
+The last step in the installation process is to configure the `Spree::ScheduleAbandonedCartsJob`
+background job to run regularly. There are different ways to do this depending on the environment
+your application is running in: Heroku Scheduler, cron etc.
+
+## Usage
+
+If you're okay with the default behavior of sending an abandoned cart email, you can simply override
+the `spree.abandoned_cart_subject` translation key and the `spree/abandoned_cart_mailer/abandoned_cart_email.html.erb`
+view. The default notifier will take care of sending the email for you.
+
+If, on the other hand, you want to use custom logic, keep reading! 
+
+### Custom notifier
+
+You can define your own abandoned cart logic by changing the `notifier_class` configuration
+parameter. Here's what an example notifier could look like, if you wanted to call an external API
+instead of sending an email:
 
 ```ruby
-Spree::AbandonedCartJob.perform
+module AwesomeStore
+  class AbandonedCartNotifier < Spree::AbandonedCartNotifier
+    def call
+      # Skip notification if this cart was already notified
+      return if order.abandoned_cart_email_sent_at
+
+      # Run your custom logic
+      MyApiService.notify_abandoned_cart(order.email)
+
+      # Mark this cart as notified
+      order.touch :abandoned_cart_email_sent_at
+    end
+  end
+end
 ```
 
-To modify the email, you just have to override `I18n.t('spree.abandoned_cart_subject')`
-and `app/views/spree/abandoned_cart_mailer/abandoned_cart_email.html.erb`.
+## Testing
 
+Run the following to automatically build a dummy app and run the tests:
 
-Testing
--------
-
-Then just run the following to automatically build a dummy app if necessary and
-run the tests:
-
-```shell
-bundle exec rake
+```console
+$ bundle exec rake
 ```
+
+## Contributing
+
+Bug reports and pull requests are welcome on GitHub at https://github.com/solidusio-contrib/solidus_abandoned_carts.
+
+## License
+
+The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).

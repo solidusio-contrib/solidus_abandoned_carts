@@ -1,56 +1,75 @@
 # frozen_string_literal: true
 
 RSpec.describe Spree::Order do
-  let(:abandoned_time) { Time.current - SolidusAbandonedCarts::Config.abandoned_after_minutes.minutes - 1.second }
-  let!(:abandoned_order) { create(:order, updated_at: abandoned_time, item_count: 100) }
+  subject(:order) { create(:order) }
 
   describe '.abandoned' do
-    let!(:fresh_order) { create(:order, item_count: 100) }
-    let!(:empty_order) { create(:order, updated_at: abandoned_time, item_count: 0) }
-    let!(:order_without_email) do
-      create(:order, updated_at: abandoned_time, item_count: 100).update_attributes(email: nil)
+    let!(:abandoned_order) do
+      create(:order,
+        updated_at: Time.zone.now - SolidusAbandonedCarts::Config.abandoned_timeout - 1.second,
+        item_count: 100,
+      )
     end
 
-    subject { described_class.abandoned }
+    before do
+      # Not abandoned, with email, with items
+      create(:order, item_count: 100)
 
-    it { is_expected.to match_array([abandoned_order]) }
+      # Abandoned, with email, no items
+      create(:order,
+        updated_at: Time.zone.now - SolidusAbandonedCarts::Config.abandoned_timeout - 1.second,
+        item_count: 0,
+      )
+
+      # Abandoned, no email, with items
+      create(:order,
+        updated_at: Time.zone.now - SolidusAbandonedCarts::Config.abandoned_timeout - 1.second,
+        item_count: 100,
+      ).update!(email: nil)
+    end
+
+    it 'returns orders that are abandoned, have an email and have items' do
+      expect(described_class.abandoned).to match_array([abandoned_order])
+    end
   end
 
   describe '.abandon_not_notified' do
-    let!(:notified_abandoned_order) do
-      create(:order, updated_at: abandoned_time, item_count: 100, abandoned_cart_email_sent_at: Time.now)
+    let!(:abandoned_order) do
+      create(:order,
+        updated_at: Time.zone.now - SolidusAbandonedCarts::Config.abandoned_timeout - 1.second,
+        item_count: 100,
+      )
     end
 
-    subject { described_class.abandon_not_notified }
-
-    it { is_expected.to match_array([abandoned_order]) }
-  end
-
-  describe '#abandoned_cart_actions' do
-    subject { abandoned_order.abandoned_cart_actions }
-
-    it 'should receive abandoned_cart_email' do
-      expect(Spree::AbandonedCartMailer).to receive(:abandoned_cart_email).with(abandoned_order).and_call_original
-
-      subject
+    before do
+      # Abandoned but notified
+      create(:order,
+        updated_at: Time.zone.now - SolidusAbandonedCarts::Config.abandoned_timeout - 1.second,
+        item_count: 100,
+        abandoned_cart_email_sent_at: Time.zone.now,
+      )
     end
 
-    it 'should set #abandoned_cart_email_sent_at' do
-      expect { subject }.to change { abandoned_order.abandoned_cart_email_sent_at }
+    it 'returns orders that are abandoned and not notified' do
+      expect(described_class.abandon_not_notified).to match_array([abandoned_order])
     end
   end
 
   describe '#last_for_user?' do
-    subject { abandoned_order.last_for_user? }
-
-    context 'when user has not another orders' do
-      it { is_expected.to be_truthy }
+    context 'when user does not have other orders' do
+      it 'returns true' do
+        expect(order).to be_last_for_user
+      end
     end
 
-    context 'when user has a new order' do
-      before { create(:order).update_attributes(email: abandoned_order.email) }
+    context 'when user has newer orders' do
+      before do
+        create(:order).update_columns(email: order.email, created_at: order.created_at + 1.minute)
+      end
 
-      it { is_expected.to be_falsey }
+      it 'returns false' do
+        expect(order).not_to be_last_for_user
+      end
     end
   end
 end
