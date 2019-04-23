@@ -13,13 +13,7 @@ module Spree
         order.abandoned_cart_actions
       end
 
-      if self.class.respond_to?(:perform_in)
-        self.class.new.perform_in(next_run.minutes) if next_run.positive?
-      end
-
-      if self.class.respond_to?(:perform_later)
-        self.class.set(wait: next_run.minutes).perform_later
-      end
+      self.class.set(wait: next_run.minutes).perform_later
     end
   end
 end
