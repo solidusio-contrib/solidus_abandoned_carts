@@ -47,7 +47,7 @@ You can perform the processing of the abandoned carts at any time:
 Spree::AbandonedCartJob.perform
 ```
 
-To modify the email, you just have to override `Spree.t(:abandoned_cart_subject)`
+To modify the email, you just have to override `I18n.t('spree.abandoned_cart_subject')`
 and `app/views/spree/abandoned_cart_mailer/abandoned_cart_email.html.erb`.
 
 

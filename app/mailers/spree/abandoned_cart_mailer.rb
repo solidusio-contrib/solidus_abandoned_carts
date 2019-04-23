@@ -5,7 +5,7 @@ module Spree
     def abandoned_cart_email(order)
       @order = order
       @store = @order.store
-      subject = "#{@store.name} - #{Spree.t(:abandoned_cart_subject)}"
+      subject = "#{@store.name} - #{I18n.t('spree.abandoned_cart_subject')}"
 
       mail(to: order.email, from: from_address(@store), subject: subject) if @order.email.present?
     end

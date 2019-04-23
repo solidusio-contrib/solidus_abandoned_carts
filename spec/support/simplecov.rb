@@ -9,5 +9,6 @@ SimpleCov.start do
   add_group 'Mailers', 'app/mailers'
   add_group 'Models', 'app/models'
   add_group 'Views', 'app/views'
+  add_group 'Decorators', 'app/decorators'
   add_group 'Libraries', 'lib'
 end
