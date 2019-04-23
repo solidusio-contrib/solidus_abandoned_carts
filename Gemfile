@@ -13,13 +13,8 @@ else
 end
 
 group :development, :test do
+  gem 'factory_bot', (branch < 'v2.5' ? '4.10.0' : '> 4.10.0')
   gem 'pry-rails'
-
-  if branch < 'v2.5'
-    gem 'factory_bot', '4.10.0'
-  else
-    gem 'factory_bot', '> 4.10.0'
-  end
 end
 
 gemspec
