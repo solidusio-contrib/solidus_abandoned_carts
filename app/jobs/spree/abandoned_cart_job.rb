@@ -7,7 +7,7 @@ module Spree
     def perform
       next_run = SolidusAbandonedCarts::Config.worker_frequency_minutes
 
-      Spree::Order.abandon_not_notified.each do |order|
+      Spree::Order.abandon_not_notified.find_each do |order|
         next unless order.last_for_user?
 
         order.abandoned_cart_actions
