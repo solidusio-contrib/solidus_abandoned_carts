@@ -13,9 +13,7 @@ module SolidusAbandonedCarts
         base.class_name_attribute :abandoned_cart_mailer_class, default: 'Spree::AbandonedCartMailer'
       end
 
-      if ::Spree.respond_to?(:solidus_version) && ::Spree.solidus_version > '2.4'
-        ::Spree::AppConfiguration.prepend self
-      end
+      ::Spree::AppConfiguration.prepend self
     end
   end
 end

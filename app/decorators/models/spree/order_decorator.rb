@@ -26,11 +26,7 @@ module SolidusAbandonedCarts
       private
 
       def abandoned_cart_class
-        if ::Spree.respond_to?(:solidus_version) && ::Spree.solidus_version > '2.4'
-          ::Spree::Config.abandoned_cart_mailer_class
-        else
-          ::Spree::AbandonedCartMailer
-        end
+        ::Spree::Config.abandoned_cart_mailer_class
       end
 
       ::Spree::Order.prepend self
