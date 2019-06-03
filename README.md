@@ -29,8 +29,17 @@ SolidusAbandonedCarts::Config.tap do |config|
   # The states in which a cart is considered to be abandoned.
   config.abandoned_states = [:cart, :address, :delivery, :payment, :confirm]
 
-  # Service object that will be called for abandoned carts.
-  config.notifier_class = 'Spree::AbandonedCartNotifier' 
+  # Set your own notifier class
+  config.notifier_class = 'Spree::AbandonedCartNotifier'
+
+  # Set your own mailer class
+  config.mailer_class = 'Spree::AbandonedCartMailer'
+
+  # Set your own notifier job class
+  config.notifier_job_class = 'Spree::NotifyAbandonedCartJob'
+
+  # Set your own schedule job class
+  config.schedule_job_class = 'Spree::ScheduleAbandonedCartsJob'
 end
 ```
 
@@ -44,7 +53,7 @@ If you're okay with the default behavior of sending an abandoned cart email, you
 the `spree.abandoned_cart_subject` translation key and the `spree/abandoned_cart_mailer/abandoned_cart_email.html.erb`
 view. The default notifier will take care of sending the email for you.
 
-If, on the other hand, you want to use custom logic, keep reading! 
+If, on the other hand, you want to use custom logic, keep reading!
 
 ### Custom notifier
 
