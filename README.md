@@ -1,6 +1,6 @@
 # SolidusAbandonedCarts
 
-[![Build Status](https://travis-ci.org/solidusio-contrib/solidus_abandoned_carts.svg?branch=master)](https://travis-ci.org/solidusio-contrib/solidus_abandoned_carts)
+[![CircleCI](https://circleci.com/gh/solidusio-contrib/solidus_abandoned_carts.svg?style=svg)](https://circleci.com/gh/solidusio-contrib/solidus_abandoned_carts)
 
 Take action on your abandoned carts!
 
