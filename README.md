@@ -24,7 +24,7 @@ If you want to change the configuration, you can add the following to an initial
 ```ruby
 SolidusAbandonedCarts::Config.tap do |config|
   # Amount of time after which a cart is considered abandoned.
-  config.abandoned_after = 24.hours
+  config.abandoned_timeout = 24.hours
 
   # The states in which a cart is considered to be abandoned.
   config.abandoned_states = [:cart, :address, :delivery, :payment, :confirm]
