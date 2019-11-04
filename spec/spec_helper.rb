@@ -1,21 +1,18 @@
 # frozen_string_literal: true
 
-ENV['RAILS_ENV'] ||= 'test'
+ENV["RAILS_ENV"] ||= "test"
 
-begin
-  require File.expand_path('dummy/config/environment', __dir__)
-rescue LoadError
-  puts 'Could not load dummy application. Please ensure you have run `bundle exec rake test_app`'
-  exit
-end
+require "solidus_support/extension/coverage"
 
-Dir[File.join(File.dirname(__FILE__), '/support/**/*.rb')].each { |file| require file }
+require File.expand_path('dummy/config/environment.rb', __dir__)
 
-require 'rspec/rails'
+require "solidus_support/extension/feature_helper"
+
+Dir[File.join(File.dirname(__FILE__), "support/**/*.rb")].each { |f| require f }
 
 RSpec.configure do |config|
-  config.fixture_path = "#{::Rails.root}/spec/fixtures"
-  config.use_transactional_fixtures = true
   config.infer_spec_type_from_file_location!
-  config.filter_rails_from_backtrace!
+  config.raise_errors_for_deprecations!
+
+  config.example_status_persistence_file_path = "./spec/examples.txt"
 end
