@@ -12,9 +12,4 @@ else
   gem 'pg', '~> 0.21'
 end
 
-group :development, :test do
-  gem 'factory_bot', (branch < 'v2.5' ? '4.10.0' : '> 4.10.0')
-  gem 'pry-rails'
-end
-
 gemspec
