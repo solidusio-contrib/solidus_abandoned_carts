@@ -7,7 +7,7 @@ module Spree
     def perform(order)
       return unless order.last_for_user?
 
-      SolidusAbandonedCarts::Config.notifier_class.constantize.new(order).call
+      SolidusAbandonedCarts::Config.notifier_class.new(order).call
     end
   end
 end

@@ -9,7 +9,7 @@ module Spree
     def call
       return if order.abandoned_cart_email_sent_at
 
-      Spree::AbandonedCartMailer.abandoned_cart_email(order).deliver_now
+      SolidusAbandonedCarts::Config.mailer_class.abandoned_cart_email(order).deliver_now
 
       order.touch(:abandoned_cart_email_sent_at)
     end
