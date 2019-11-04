@@ -9,7 +9,7 @@ gem 'solidus_auth_devise'
 if ENV['DB'] == 'mysql'
   gem 'mysql2', '~> 0.4.10'
 else
-  gem 'pg', '~> 0.21'
+  gem 'pg', '~> 1.1'
 end
 
 group :development, :test do
