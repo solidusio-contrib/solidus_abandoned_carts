@@ -4,12 +4,14 @@ source 'https://rubygems.org'
 
 branch = ENV.fetch('SOLIDUS_BRANCH', 'master')
 gem 'solidus', github: 'solidusio/solidus', branch: branch
-gem 'solidus_auth_devise'
 
-if ENV['DB'] == 'mysql'
-  gem 'mysql2', '~> 0.4.10'
+case ENV['DB']
+when 'mysql'
+  gem 'mysql2'
+when 'postgres'
+  gem 'pg'
 else
-  gem 'pg', '~> 1.1'
+  gem 'sqlite3'
 end
 
 gemspec
