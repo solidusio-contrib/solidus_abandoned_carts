@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'deface', '~> 1.0'
   s.add_dependency 'solidus', ['>= 2.0', '< 3']
-  s.add_dependency 'solidus_support', '~> 0.3.3'
+  s.add_dependency 'solidus_support', '>= 0.3.3', '< 0.5.0'
 
   s.add_development_dependency 'solidus_extension_dev_tools'
 end
