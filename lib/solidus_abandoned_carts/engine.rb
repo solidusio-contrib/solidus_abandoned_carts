@@ -1,11 +1,15 @@
 # frozen_string_literal: true
 
+require 'solidus_dev_support'
+require 'spree/core'
+
 module SolidusAbandonedCarts
   class Engine < Rails::Engine
-    isolate_namespace Spree
-    engine_name 'solidus_abandoned_carts'
+    include SolidusSupport::EngineExtensions::Decorators
 
-    config.autoload_paths += %W(#{config.root}/lib)
+    isolate_namespace Spree
+
+    engine_name 'solidus_abandoned_carts'
 
     # use rspec for tests
     config.generators do |g|
@@ -15,13 +19,5 @@ module SolidusAbandonedCarts
     initializer 'solidus_abandoned_carts.environment', before: :load_config_initializers do
       SolidusAbandonedCarts::Config = SolidusAbandonedCarts::Configuration.new
     end
-
-    def self.activate
-      Dir.glob(File.join(File.dirname(__FILE__), '../../app/**/*_decorator*.rb')) do |c|
-        Rails.configuration.cache_classes ? require(c) : load(c)
-      end
-    end
-
-    config.to_prepare(&method(:activate).to_proc)
   end
 end
