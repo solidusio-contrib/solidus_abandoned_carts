@@ -1,0 +1,5 @@
+bump:
+  recurse: false
+  file: 'lib/solidus_abandoned_carts/version.rb'
+  message: Bump SolidusAbandonedCarts to %{version}
+  branch: true
