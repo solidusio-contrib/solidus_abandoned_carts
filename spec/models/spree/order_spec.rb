@@ -1,12 +1,19 @@
 # frozen_string_literal: true
 
 RSpec.describe Spree::Order do
+  let(:abandoned_date) do
+   DateTime.now - SolidusAbandonedCarts::Config.abandoned_date.to_i.days
+  end
+  let(:abandoned_timeout) do
+    SolidusAbandonedCarts::Config.abandoned_timeout
+  end
+
   subject(:order) { create(:order) }
 
   describe '.abandoned' do
     let!(:abandoned_order) do
       create(:order,
-        updated_at: Time.zone.now - SolidusAbandonedCarts::Config.abandoned_timeout - 1.second,
+        updated_at: abandoned_date - abandoned_timeout,
         item_count: 100,
       )
     end
@@ -17,13 +24,13 @@ RSpec.describe Spree::Order do
 
       # Abandoned, with email, no items
       create(:order,
-        updated_at: Time.zone.now - SolidusAbandonedCarts::Config.abandoned_timeout - 1.second,
+        updated_at: abandoned_date - abandoned_timeout,
         item_count: 0,
       )
 
       # Abandoned, no email, with items
       create(:order,
-        updated_at: Time.zone.now - SolidusAbandonedCarts::Config.abandoned_timeout - 1.second,
+        updated_at: abandoned_date - abandoned_timeout,
         item_count: 100,
       ).update!(email: nil)
     end
@@ -36,7 +43,7 @@ RSpec.describe Spree::Order do
   describe '.abandon_not_notified' do
     let!(:abandoned_order) do
       create(:order,
-        updated_at: Time.zone.now - SolidusAbandonedCarts::Config.abandoned_timeout - 1.second,
+        updated_at: abandoned_date - abandoned_timeout,
         item_count: 100,
       )
     end
@@ -44,9 +51,9 @@ RSpec.describe Spree::Order do
     before do
       # Abandoned but notified
       create(:order,
-        updated_at: Time.zone.now - SolidusAbandonedCarts::Config.abandoned_timeout - 1.second,
+        updated_at: abandoned_date - abandoned_timeout,
         item_count: 100,
-        abandoned_cart_email_sent_at: Time.zone.now,
+        abandoned_cart_email_sent_at: abandoned_date,
       )
     end
 
@@ -64,7 +71,10 @@ RSpec.describe Spree::Order do
 
     context 'when user has newer orders' do
       before do
-        create(:order).update_columns(email: order.email, created_at: order.created_at + 1.minute)
+        create(:order).update_columns(
+          email: order.email,
+          created_at: order.created_at + 1.minute
+        )
       end
 
       it 'returns false' do
