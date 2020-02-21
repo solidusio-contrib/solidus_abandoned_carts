@@ -3,9 +3,14 @@
 RSpec.describe Spree::Order do
   subject(:order) { create(:order) }
 
+  before do
+    stub_spree_preferences(SolidusAbandonedCarts::Config, abandoned_timeout: 24.hours)
+  end
+
   describe '.abandoned' do
     let!(:abandoned_order) do
-      create(:order,
+      create(
+        :order,
         updated_at: Time.zone.now - SolidusAbandonedCarts::Config.abandoned_timeout - 1.second,
         item_count: 100,
       )
@@ -16,13 +21,15 @@ RSpec.describe Spree::Order do
       create(:order, item_count: 100)
 
       # Abandoned, with email, no items
-      create(:order,
+      create(
+        :order,
         updated_at: Time.zone.now - SolidusAbandonedCarts::Config.abandoned_timeout - 1.second,
         item_count: 0,
       )
 
       # Abandoned, no email, with items
-      create(:order,
+      create(
+        :order,
         updated_at: Time.zone.now - SolidusAbandonedCarts::Config.abandoned_timeout - 1.second,
         item_count: 100,
       ).update!(email: nil)
@@ -34,24 +41,51 @@ RSpec.describe Spree::Order do
   end
 
   describe '.abandon_not_notified' do
-    let!(:abandoned_order) do
-      create(:order,
-        updated_at: Time.zone.now - SolidusAbandonedCarts::Config.abandoned_timeout - 1.second,
+    let!(:first_abandoned_order) do
+      create(
+        :order,
+        updated_at: abandoned_timeout,
         item_count: 100,
       )
     end
 
+    let!(:second_abandoned_order) do
+      # Abandoned but too old with retroactivity set
+      create(
+        :order,
+        updated_at: abandoned_timeout - 1.month,
+        item_count: 100
+      )
+    end
+
+    let(:abandoned_timeout) { Time.current - SolidusAbandonedCarts::Config.abandoned_timeout - 1.second }
+
     before do
+      stub_spree_preferences(SolidusAbandonedCarts::Config, abandoned_retroactivity: abandoned_retroactivity)
+
       # Abandoned but notified
-      create(:order,
-        updated_at: Time.zone.now - SolidusAbandonedCarts::Config.abandoned_timeout - 1.second,
+      create(
+        :order,
+        updated_at: abandoned_timeout,
         item_count: 100,
         abandoned_cart_email_sent_at: Time.zone.now,
       )
     end
 
-    it 'returns orders that are abandoned and not notified' do
-      expect(described_class.abandon_not_notified).to match_array([abandoned_order])
+    context 'when the retroactivity configuration is set' do
+      let(:abandoned_retroactivity) { 1.month }
+
+      it 'returns orders that are abandoned and not notified' do
+        expect(described_class.abandon_not_notified).to match_array([first_abandoned_order])
+      end
+    end
+
+    context 'when the retroactivity configuration is not set' do
+      let(:abandoned_retroactivity) { nil }
+
+      it 'returns orders that are abandoned and not notified' do
+        expect(described_class.abandon_not_notified).to match_array([first_abandoned_order, second_abandoned_order])
+      end
     end
   end
 
@@ -64,7 +98,7 @@ RSpec.describe Spree::Order do
 
     context 'when user has newer orders' do
       before do
-        create(:order).update_columns(email: order.email, created_at: order.created_at + 1.minute)
+        create(:order).update!(email: order.email, created_at: order.created_at + 1.minute)
       end
 
       it 'returns false' do

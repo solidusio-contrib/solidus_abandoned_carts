@@ -3,6 +3,8 @@
 module SolidusAbandonedCarts
   module Generators
     class InstallGenerator < Rails::Generators::Base
+      source_root File.expand_path('templates', __dir__)
+
       class_option :auto_run_migrations, type: :boolean, default: false
 
       def add_migrations
@@ -16,6 +18,10 @@ module SolidusAbandonedCarts
         else
           puts 'Skipping rake db:migrate, don\'t forget to run it!' # rubocop:disable Rails/Output
         end
+      end
+
+      def copy_initializer
+        copy_file 'initializer.rb', 'config/initializers/solidus_abandoned_carts.rb'
       end
     end
   end
