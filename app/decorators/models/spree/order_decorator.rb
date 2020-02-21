@@ -11,7 +11,16 @@ module SolidusAbandonedCarts
             where('updated_at < ?', time)
         end
 
-        base.scope :abandon_not_notified, -> { abandoned.where(abandoned_cart_email_sent_at: nil) }
+        base.scope :abandon_not_notified, -> do
+          relation = abandoned.where(abandoned_cart_email_sent_at: nil)
+
+          if SolidusAbandonedCarts::Config.abandoned_retroactivity
+            retroactivity = Time.current - SolidusAbandonedCarts::Config.abandoned_retroactivity
+            relation = relation.where('updated_at > ?', retroactivity)
+          end
+
+          relation
+        end
       end
 
       def last_for_user?
