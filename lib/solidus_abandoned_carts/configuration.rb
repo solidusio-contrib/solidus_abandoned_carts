@@ -4,7 +4,9 @@ module SolidusAbandonedCarts
   class Configuration < Spree::Preferences::Configuration
     preference :abandoned_states, :array, default: %i[cart address delivery payment confirm]
     preference :abandoned_timeout, :time, default: 24.hours
-    preference :abandoned_retroactivity, :time, default: nil
+    preference :abandoned_max_timeout, :time, default: 1.week
+
+    alias abandoned_retroactivity abandoned_max_timeout
 
     class_name_attribute :mailer_class, default: 'Spree::AbandonedCartMailer'
     class_name_attribute :notifier_class, default: 'Spree::AbandonedCartNotifier'

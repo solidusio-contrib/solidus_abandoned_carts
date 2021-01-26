@@ -10,7 +10,7 @@ SolidusAbandonedCarts::Config.tap do |config|
   # Override the time which restricts the abandoned orders
   # avoiding that the older ones aren't considered abandoned.
   # Can be set to nil to remove this restriction
-  config.abandoned_retroactivity = 1.month
+  config.abandoned_max_timeout = 1.month
 
   # Override mailer classes
   # config.mailer_class = 'Spree::AbandonedCartMailer'

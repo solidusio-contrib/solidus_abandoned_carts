@@ -50,7 +50,7 @@ RSpec.describe Spree::Order do
     end
 
     let!(:second_abandoned_order) do
-      # Abandoned but too old with retroactivity set
+      # Abandoned but too old with max_timeout set
       create(
         :order,
         updated_at: abandoned_timeout - 1.month,
@@ -61,7 +61,7 @@ RSpec.describe Spree::Order do
     let(:abandoned_timeout) { Time.current - SolidusAbandonedCarts::Config.abandoned_timeout - 1.second }
 
     before do
-      stub_spree_preferences(SolidusAbandonedCarts::Config, abandoned_retroactivity: abandoned_retroactivity)
+      stub_spree_preferences(SolidusAbandonedCarts::Config, abandoned_max_timeout: abandoned_max_timeout)
 
       # Abandoned but notified
       create(
@@ -72,16 +72,16 @@ RSpec.describe Spree::Order do
       )
     end
 
-    context 'when the retroactivity configuration is set' do
-      let(:abandoned_retroactivity) { 1.month }
+    context 'when the max_timeout configuration is set' do
+      let(:abandoned_max_timeout) { 1.month }
 
       it 'returns orders that are abandoned and not notified' do
         expect(described_class.abandon_not_notified).to match_array([first_abandoned_order])
       end
     end
 
-    context 'when the retroactivity configuration is not set' do
-      let(:abandoned_retroactivity) { nil }
+    context 'when the max_timeout configuration is not set' do
+      let(:abandoned_max_timeout) { nil }
 
       it 'returns orders that are abandoned and not notified' do
         expect(described_class.abandon_not_notified).to match_array([first_abandoned_order, second_abandoned_order])

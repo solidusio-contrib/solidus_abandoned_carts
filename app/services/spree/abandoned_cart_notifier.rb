@@ -6,10 +6,10 @@ module Spree
       @order = order
     end
 
-    def call
+    def call(delivery = :deliver_now)
       return if order.abandoned_cart_email_sent_at
 
-      SolidusAbandonedCarts::Config.mailer_class.abandoned_cart_email(order).deliver_now
+      SolidusAbandonedCarts::Config.mailer_class.abandoned_cart_email(order).send(delivery)
 
       order.touch(:abandoned_cart_email_sent_at)
     end

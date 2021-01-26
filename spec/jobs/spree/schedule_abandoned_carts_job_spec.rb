@@ -1,34 +1,43 @@
 # frozen_string_literal: true
 
 RSpec.describe Spree::ScheduleAbandonedCartsJob, type: :job do
-  subject { -> { described_class.perform_now } }
-
-  let(:order) { instance_double('Spree::Order', last_for_user?: last_for_user) }
-
-  before do
-    relation = instance_double('Spree::Order::ActiveRecord_Relation')
-    allow(Spree::Order).to receive(:abandon_not_notified).and_return(relation)
-    allow(relation).to receive(:find_each).and_yield(order)
-    stub_const('Spree::NotifyAbandonedCartJob', class_spy('Spree::NotifyAbandonedCartJob'))
+  let(:user) { create :user }
+  let!(:order) do
+    create :order, item_count: 1, completed_at: nil, email: user.email,
+      user: user, abandoned_cart_email_sent_at: nil, updated_at: 26.hours.ago
   end
 
+  before { clear_enqueued_jobs }
+
   context "when an order is the user's last" do
-    let(:last_for_user) { true }
-
     it 'gets scheduled for notification' do
-      subject.call
+      described_class.perform_now
 
-      expect(Spree::NotifyAbandonedCartJob).to have_received(:perform_later).with(order)
+      order.reload
+      expect(ActionMailer::Base.deliveries.size).to be 0
+      expect(enqueued_jobs.size).to be 1
+
+      expect(order.abandoned_cart_email_sent_at).not_to be_nil
     end
   end
 
-  context "when an order is not the user's last" do
-    let(:last_for_user) { false }
+  context 'when an order is not the user\'s last' do
+    let!(:new_order) do
+      create :order, item_count: 1, completed_at: nil, email: order.email,
+        user: user, abandoned_cart_email_sent_at: nil, updated_at: 25.hours.ago
+    end
 
-    it 'gets scheduled for notification' do
-      subject.call
+    it 'will not send a notification out' do
+      described_class.perform_now
 
-      expect(Spree::NotifyAbandonedCartJob).not_to have_received(:perform_later)
+      order.reload
+      new_order.reload
+
+      expect(ActionMailer::Base.deliveries.size).to be 0
+      expect(enqueued_jobs.size).to be 1
+
+      expect(order.abandoned_cart_email_sent_at).to be_nil
+      expect(new_order.abandoned_cart_email_sent_at).not_to be_nil
     end
   end
 end

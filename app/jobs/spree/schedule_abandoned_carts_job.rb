@@ -6,9 +6,7 @@ module Spree
 
     def perform
       Spree::Order.abandon_not_notified.find_each do |order|
-        next unless order.last_for_user?
-
-        SolidusAbandonedCarts::Config.notifier_job_class.perform_later(order)
+        SolidusAbandonedCarts::Config.notifier_class.new(order).call(:deliver_later)
       end
     end
   end

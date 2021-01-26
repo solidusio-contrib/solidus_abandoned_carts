@@ -2,19 +2,14 @@
 
 namespace :solidus_abandoned_carts do
   task send_notification: :environment do
-    puts "Sending abandoned carts notifications..."
+    Rails.logger.info "Sending abandoned carts notifications..."
 
-    abandonded_carts = Spree::Order.abandon_not_notified
-    if abandonded_carts
-      abandonded_carts.find_each do |order|
-        next unless order.last_for_user?
+    abandoned_cart_count = Spree::Order.abandon_not_notified.count
 
-        Spree::NotifyAbandonedCartJob.perform_now(order)
-      end if abandonded_carts
-
-      puts "notifications sent: #{abandonded_carts.count}"
+    Spree::Order.abandon_not_notified.find_each do |order|
+      SolidusAbandonedCarts::Config.notifier_class.new(order).call(:deliver_later)
     end
 
-    puts "Done!"
+    Rails.logger.info "notifications sent: #{abandoned_cart_count}"
   end
 end
