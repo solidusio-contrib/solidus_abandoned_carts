@@ -4,13 +4,13 @@ RSpec.describe 'solidus_abandoned_carts:send_notification' do
   let(:user) { create(:user) }
   let!(:order1) do
     order = create(:order_with_line_items, user: user)
-    order.update_attributes(updated_at: (Time.current - 48.hours),
+    order.update(updated_at: (Time.current - 48.hours),
                             abandoned_cart_email_sent_at: nil)
     order
   end
   let!(:order2) do
     order = create(:order_with_line_items, user: user)
-    order.update_attributes(updated_at: (Time.current - 48.hours),
+    order.update(updated_at: (Time.current - 48.hours),
                             abandoned_cart_email_sent_at: nil)
     order
   end
