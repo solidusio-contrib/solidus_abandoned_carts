@@ -1,0 +1,38 @@
+Rails/HasManyOrHasOneDependent:
+  Enabled: false
+
+Rails/CreateTableWithTimestamps:
+  Enabled: false
+
+Layout/ArgumentAlignment:
+  Enabled: false
+
+Gemspec/RequiredRubyVersion:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/LetSetup:
+  Enabled: false
+
+Layout/HashAlignment:
+  Enabled: false
+
+RSpec/NamedSubject:
+  Enabled: false
+
+RSpec/HookArgument:
+  Enabled: false
+
+Rails/ApplicationJob:
+  Enabled: false
+
+RSpec/DescribeClass:
+  Enabled: false
+
+RSpec/ContextWording:
+  Enabled: false
+
+Rails/SkipsModelValidations:
+  Enabled: false

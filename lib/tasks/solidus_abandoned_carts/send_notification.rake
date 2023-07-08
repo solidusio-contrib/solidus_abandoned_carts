@@ -2,7 +2,7 @@
 
 namespace :solidus_abandoned_carts do
   task send_notification: :environment do
-    puts "Sending abandoned carts notifications..."
+    puts 'Sending abandoned carts notifications...'
 
     abandonded_carts = Spree::Order.abandon_not_notified
     if abandonded_carts
@@ -10,11 +10,11 @@ namespace :solidus_abandoned_carts do
         next unless order.last_for_user?
 
         Spree::NotifyAbandonedCartJob.perform_now(order)
-      end if abandonded_carts
+      end
 
       puts "notifications sent: #{abandonded_carts.count}"
     end
 
-    puts "Done!"
+    puts 'Done!'
   end
 end
